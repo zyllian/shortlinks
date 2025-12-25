@@ -1,4 +1,4 @@
-use std::collections::BTreeMap;
+use std::{collections::BTreeMap, net::SocketAddr};
 
 use axum::{
 	Router,
@@ -25,7 +25,13 @@ async fn main() -> eyre::Result<()> {
 		.route("/{*shortlink}", get(shortlink_handler))
 		.with_state(config);
 
-	let listener = TcpListener::bind("0.0.0.0:80").await?;
+	let addrs: Vec<SocketAddr> = config
+		.bind
+		.iter()
+		.map(|a| a.parse())
+		.collect::<Result<_, _>>()?;
+
+	let listener = TcpListener::bind(addrs.as_slice()).await?;
 	axum::serve(listener, app).await?;
 
 	Ok(())
@@ -82,6 +88,8 @@ fn find_shortlink<'m>(shortlink: &str, map: &'m ShortlinkMap) -> Option<&'m str>
 /// the shortlink handler's configuration
 #[derive(Debug, Deserialize)]
 struct Config {
+	/// addresses and ports to bind the listener to
+	bind: Vec<String>,
 	/// message to display when a shortlink isn't found. may contain html
 	not_found_message: String,
 	/// the map of links to redirect users to
