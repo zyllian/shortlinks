@@ -1,0 +1,13 @@
+{
+	"bind": [
+		"0.0.0.0:80"
+	],
+	"not_found_message": "shortlink not found :(",
+	"links": {
+		"test": "https://github.com",
+		"shortlinks": {
+			"$root": "https://github.com/zyllian/shortlinks",
+			"issues": "https://github.com/zyllian/shortlinks/issues"
+		}
+	}
+}
