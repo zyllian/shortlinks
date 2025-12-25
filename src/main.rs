@@ -48,12 +48,15 @@ async fn shortlink_handler(
 #[derive(Debug, Deserialize)]
 #[serde(untagged)]
 enum ShortlinkEntry {
+	/// the shortlink entry contains a link
 	Link(String),
+	/// the shortlink entry contains a map of nested shortlink entries
 	Nested(ShortlinkMap),
 }
 
 type ShortlinkMap = BTreeMap<String, ShortlinkEntry>;
 
+/// helper to find a shortlink entry from the given shortlink
 fn find_shortlink<'m>(shortlink: &str, map: &'m ShortlinkMap) -> Option<&'m str> {
 	let mut segments = shortlink.split('/');
 	let mut selection = map.get(segments.next()?)?;
@@ -76,8 +79,11 @@ fn find_shortlink<'m>(shortlink: &str, map: &'m ShortlinkMap) -> Option<&'m str>
 	}
 }
 
+/// the shortlink handler's configuration
 #[derive(Debug, Deserialize)]
 struct Config {
+	/// message to display when a shortlink isn't found. may contain html
 	not_found_message: String,
+	/// the map of links to redirect users to
 	links: ShortlinkMap,
 }
